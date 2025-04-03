@@ -64,4 +64,5 @@ def quiz():
     return jsonify({"response": responses.get(answer, "Merci pour ta réponse.")})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=False, host="0.0.0.0", port=port)
