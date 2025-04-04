@@ -1,109 +1,146 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Stalker</title>
-    <script>
-        const phrases = [
-            "Stalker ne sert à rien",
-            "C’est fou ce que l’ennui pousse à faire"
-        ];
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stalker</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #eee;
+      font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+    }
 
-        function generateId() {
-            return 'xxxxxxx'.replace(/[x]/g, () =>
-                (Math.random()*36|0).toString(36)
-            );
-        }
+    h1 {
+      font-size: 1.8rem;
+      text-align: center;
+      margin-top: 50px;
+    }
 
-        async function sendVisit() {
-            let user_id = localStorage.getItem("user_id");
-            if (!user_id) {
-                user_id = generateId();
-                localStorage.setItem("user_id", user_id);
-            }
+    p {
+      font-size: 1rem;
+      text-align: center;
+      max-width: 90%;
+    }
 
-            const res = await fetch("/visit", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id })
-            });
+    button {
+      background: #333;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      width: 90%;
+      max-width: 300px;
+    }
 
-            const data = await res.json();
-            if (document.getElementById("stats").style.display !== "none") {
-                document.getElementById("global").innerText = data.global_visits;
-                document.getElementById("user").innerText = data.user_visits;
-            }
-            const random = phrases[Math.floor(Math.random() * phrases.length)];
-            document.getElementById("main-text").innerText = random;
-        }
+    button:hover {
+      background: #555;
+    }
 
-        async function sendQuiz(answer) {
-            const res = await fetch("/quiz", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ answer })
-            });
+    #stats {
+      display: none;
+      margin-top: 20px;
+    }
 
-            const data = await res.json();
-            document.getElementById("quiz-response").innerText = data.response;
-            document.getElementById("quiz-buttons").style.display = "none";
-        }
+    #quiz-response {
+      font-style: italic;
+      margin-top: 20px;
+    }
 
-        window.onload = function() {
-            sendVisit();
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get("showstats") === "monsecret") {
-                document.getElementById("stats").style.display = "block";
-            }
-        };
-    </script>
-    <style>
-        body {
-            background-color: #111;
-            color: #eee;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 100px;
-        }
-        button {
-            background: #333;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            margin: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #555;
-        }
-        #stats {
-            display: none;
-        }
-        footer {
-            margin-top: 50px;
-            font-size: 0.8em;
-            color: #777;
-        }
-    </style>
+    footer {
+      margin-top: 50px;
+      font-size: 0.8rem;
+      color: #777;
+      text-align: center;
+    }
+  </style>
+  <script>
+    const phrases = [
+      "Stalker ne sert à rien",
+      "C’est fou ce que l’ennui pousse à faire"
+    ];
+
+    function generateId() {
+      return 'xxxxxxx'.replace(/[x]/g, () =>
+        (Math.random() * 36 | 0).toString(36)
+      );
+    }
+
+    async function sendVisit() {
+      let user_id = localStorage.getItem("user_id");
+      if (!user_id) {
+        user_id = generateId();
+        localStorage.setItem("user_id", user_id);
+      }
+
+      const res = await fetch("/visit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id })
+      });
+
+      const data = await res.json();
+      if (document.getElementById("stats").style.display !== "none") {
+        document.getElementById("global").innerText = data.global_visits;
+        document.getElementById("user").innerText = data.user_visits;
+      }
+
+      const random = phrases[Math.floor(Math.random() * phrases.length)];
+      document.getElementById("main-text").innerText = random;
+    }
+
+    async function sendQuiz(answer) {
+      const res = await fetch("/quiz", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answer })
+      });
+
+      const data = await res.json();
+      document.getElementById("quiz-response").innerText = data.response;
+      document.getElementById("quiz-buttons").style.display = "none";
+    }
+
+    window.onload = function () {
+      sendVisit();
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("showstats") === "monsecret") {
+        document.getElementById("stats").style.display = "block";
+      }
+    };
+  </script>
 </head>
 <body>
-    <h1 id="main-text">...</h1>
-    <div id="stats">
-        <p>Nombre total de visites : <span id="global">...</span></p>
-        <p>Nombre de tes visites : <span id="user">...</span></p>
-    </div>
-    <hr style="width: 200px; margin: 40px auto; border-color: #333;">
-    <p><strong>Pourquoi es-tu venu ici ?</strong></p>
-    <div id="quiz-buttons">
-        <button onclick="sendQuiz('Je m’ennuyais')">Je m’ennuyais</button>
-        <button onclick="sendQuiz('Je suis curieux(se)')">Je suis curieux(se)</button>
-        <button onclick="sendQuiz('Je te stalke, j’avoue')">Je te stalke, j’avoue</button>
-        <button onclick="sendQuiz('Je voulais voir si t’avais mis quelque chose')">Je voulais voir si t’avais mis quelque chose</button>
-        <button onclick="sendQuiz('J’espérais trouver un message')">J’espérais trouver un message</button>
-        <button onclick="sendQuiz('Je ne sais même pas pourquoi je suis là')">Je ne sais même pas pourquoi je suis là</button>
-    </div>
-    <p id="quiz-response" style="margin-top: 20px; font-style: italic;"></p>
-    <footer>Developed by Mohamed 💻</footer>
+  <h1 id="main-text">...</h1>
+
+  <div id="stats">
+    <p>Nombre total de visites : <span id="global">...</span></p>
+    <p>Nombre de tes visites : <span id="user">...</span></p>
+  </div>
+
+  <p><strong>Pourquoi es-tu venu ici ?</strong></p>
+
+  <div id="quiz-buttons">
+    <button onclick="sendQuiz('Je m’ennuyais')">Je m’ennuyais</button>
+    <button onclick="sendQuiz('Je suis curieux(se)')">Je suis curieux(se)</button>
+    <button onclick="sendQuiz('Je te stalke, j’avoue')">Je te stalke, j’avoue</button>
+    <button onclick="sendQuiz('Je voulais voir si t’avais mis quelque chose')">Je voulais voir si t’avais mis quelque chose</button>
+    <button onclick="sendQuiz('J’espérais trouver un message')">J’espérais trouver un message</button>
+    <button onclick="sendQuiz('Je ne sais même pas pourquoi je suis là')">Je ne sais même pas pourquoi je suis là</button>
+  </div>
+
+  <p id="quiz-response"></p>
+
+  <footer>Developed by Mohamed 💻</footer>
 </body>
 </html>
